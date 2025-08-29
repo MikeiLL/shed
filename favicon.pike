@@ -61,6 +61,7 @@ int main(int argc, array(string) argv) {
   // https://pike.lysator.liu.se/generated/manual/modref/ex/predef_3A_3A/Image/Color.html#Color
   array shapecol = Colors.parse_color(shapecolor); // RGB array
   Image.Image icon = Image.Image(64, 64, @Colors.parse_color(bgcolor));
+  array txtcol = Colors.parse_color(textcolor);
 
   switch (shape) {
     case "circle":
@@ -79,6 +80,6 @@ int main(int argc, array(string) argv) {
     case "none": case "square": break;
     default: exit(1, "Unrecognized shape %O\n", shape);
   }
-  icon.paste_mask(ltr,ltr, (IMAGE_SIZE - ltr->xsize()) / 2, (IMAGE_SIZE - ltr->ysize()) / 2);
+  icon->paste_mask(Image.Image(ltr->xsize(), ltr->ysize(), @txtcol),ltr, (IMAGE_SIZE - ltr->xsize()) / 2, (IMAGE_SIZE - ltr->ysize()) / 2);
   Stdio.write_file("favicon.png",Image.PNG.encode(icon));
 }
