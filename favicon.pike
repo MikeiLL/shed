@@ -38,6 +38,12 @@ int main(int argc, array(string) argv) {
     write("USAGE: %s [text] [bgcolor] [textcolor] [shape (circle, diamond, triangle)] [shapecolor]\n", basename(argv[0]));
     return 0;
   }
+  string fontspath = "/Users/mikekilmer/Library/Fonts";
+  Image.Fonts.set_font_dirs(({fontspath}));
+  object font = Image.Fonts.open_font("Lato", 70, 0);
+  if (has_value(argv, "--listfonts")) {
+    write("Fonts in %s: %O\n", fontspath, sort(indices(Image.Fonts.list_fonts())));
+  }
   constant IMAGE_SIZE = 64;
   [string text,
   string bgcolor,
