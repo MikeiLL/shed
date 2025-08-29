@@ -40,7 +40,6 @@ int main(int argc, array(string) argv) {
   }
   string fontspath = "/Users/mikekilmer/Library/Fonts";
   Image.Fonts.set_font_dirs(({fontspath}));
-  object font = Image.Fonts.open_font("Lato", 70, 0);
   if (has_value(argv, "--listfonts")) {
     write("Fonts in %s: %O\n", fontspath, sort(indices(Image.Fonts.list_fonts())));
   }
@@ -49,8 +48,16 @@ int main(int argc, array(string) argv) {
   string bgcolor,
   string textcolor,
   string shape,
-  string shapecolor] = argv[1..] + ({"D", "#fff", "#000", "circle", "#bbb"})[argc-1..];
-
+  string shapecolor] = argv[1..] + ({"M", "#fff", "#000", "circle", "#bbb"})[argc-1..];
+  int desired_height = IMAGE_SIZE - 4; //2px padding top and bottom
+  Image.Image ltr;
+  // Find the biggest letter of specified font that fits within threshold
+  for (int sz = IMAGE_SIZE / 2; sz < 1024; ++sz) {
+    object font = Image.Fonts.open_font("Lato", sz, Image.Fonts.BOLD);
+    Image.Image tryme = font->write(text)->autocrop();
+    if (tryme->ysize() <= desired_height) ltr = tryme;
+    if (tryme->ysize() >= desired_height) break;
+  }
   // https://pike.lysator.liu.se/generated/manual/modref/ex/predef_3A_3A/Image/Color.html#Color
   array shapecol = Colors.parse_color(shapecolor); // RGB array
   Image.Image icon = Image.Image(64, 64, @Colors.parse_color(bgcolor));
@@ -72,5 +79,6 @@ int main(int argc, array(string) argv) {
     case "none": case "square": break;
     default: exit(1, "Unrecognized shape %O\n", shape);
   }
+  icon.paste_mask(ltr,ltr, (IMAGE_SIZE - ltr->xsize()) / 2, (IMAGE_SIZE - ltr->ysize()) / 2);
   Stdio.write_file("favicon.png",Image.PNG.encode(icon));
 }
