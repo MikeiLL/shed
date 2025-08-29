@@ -37,10 +37,14 @@ int main(int argc, array(string) argv) {
   mapping args = Arg.parse(argv); // parsed arguments
   if (args->help) {
     write(#"USAGE: %s [text] [bgcolor] [textcolor] [shape] [shapecolor]
-    SUPPORTED SHAPES: circle
+    SUPPORTED SHAPES: circle or default to none
+    (Leave off last two parameters for no circle.)
     OPTIONAL FLAGS
     --help
     --fontpath
+    EXAMPLES:
+      %<s C magenta aliceblue
+      %<s X magenta rebeccapurple circle darkblue
     ", basename(argv[0]));
     return 0;
   }
@@ -54,7 +58,7 @@ int main(int argc, array(string) argv) {
   string bgcolor,
   string textcolor,
   string shape,
-  string shapecolor] = args[Arg.REST] + ({"M", "#fff", "#000", "circle", "#bbb"})[sizeof(args[Arg.REST])];
+  string shapecolor] = args[Arg.REST] + ({"M", "#fff", "#000", "none", "#bbb"})[sizeof(args[Arg.REST])..];
   int desired_height = IMAGE_SIZE - 4; //2px padding top and bottom
   Image.Image ltr;
   // Find the biggest letter of specified font that fits within threshold
