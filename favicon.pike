@@ -34,13 +34,19 @@ Enhancement: Also output a manifest.json file:
 */
 
 int main(int argc, array(string) argv) {
-  if (has_value(argv, "--help")) {
-    write("USAGE: %s [text] [bgcolor] [textcolor] [shape (circle, diamond, triangle)] [shapecolor]\n", basename(argv[0]));
+  mapping args = Arg.parse(argv); // parsed arguments
+  if (args->help) {
+    write(#"USAGE: %s [text] [bgcolor] [textcolor] [shape] [shapecolor]
+    SUPPORTED SHAPES: circle
+    OPTIONAL FLAGS
+    --help
+    --fontpath
+    ", basename(argv[0]));
     return 0;
   }
-  string fontspath = "/Users/mikekilmer/Library/Fonts";
+  string fontspath = args->fontpath || "/Users/mikekilmer/Library/Fonts";
   Image.Fonts.set_font_dirs(({fontspath}));
-  if (has_value(argv, "--listfonts")) {
+  if (args->listfonts) {
     write("Fonts in %s: %O\n", fontspath, sort(indices(Image.Fonts.list_fonts())));
   }
   constant IMAGE_SIZE = 64;
@@ -48,7 +54,7 @@ int main(int argc, array(string) argv) {
   string bgcolor,
   string textcolor,
   string shape,
-  string shapecolor] = argv[1..] + ({"M", "#fff", "#000", "circle", "#bbb"})[argc-1..];
+  string shapecolor] = args[Arg.REST] + ({"M", "#fff", "#000", "circle", "#bbb"})[sizeof(args[Arg.REST])];
   int desired_height = IMAGE_SIZE - 4; //2px padding top and bottom
   Image.Image ltr;
   // Find the biggest letter of specified font that fits within threshold
