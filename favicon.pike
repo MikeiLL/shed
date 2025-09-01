@@ -36,7 +36,7 @@ Enhancement: Also output a manifest.json file:
 int main(int argc, array(string) argv) {
   mapping args = Arg.parse(argv); // parsed arguments
   if (args->help) {
-    write(#"USAGE: %s [text] [bgcolor] [textcolor] [shape] [shapecolor]
+    write(#"USAGE: %s [text] [primaryColor] [textcolor] [shape] [secondaryColor]
     SUPPORTED SHAPES: circle or default to none
     (Leave off last two parameters for no circle.)
     OPTIONAL FLAGS
@@ -53,12 +53,25 @@ int main(int argc, array(string) argv) {
   if (args->listfonts) {
     write("Fonts in %s: %O\n", fontspath, sort(indices(Image.Fonts.list_fonts())));
   }
+  if (args->shapes) {
+    write("Shape Options %s: %O\n", fontspath, sort(({
+      "square (default)",
+      "hsplit (split horizontal)",
+      "vsplit (split vertical)",
+      "dsplitl (split diagonal left top to right bottom)",
+      "dsplitr (split diagonal right top to left bottom)",
+      "hstripe (stripe horizontal)",
+      "vstripe (stripe vertical)",
+      "star (of David)",
+      "diamond (rotated square)"
+    })));
+  }
   constant IMAGE_SIZE = 64;
   [string text,
-  string bgcolor,
+  string primaryColor,
   string textcolor,
   string shape,
-  string shapecolor] = args[Arg.REST] + ({"M", "#fff", "#000", "none", "#bbb"})[sizeof(args[Arg.REST])..];
+  string secondaryColor] = args[Arg.REST] + ({"M", "#fff", "#000", "none", "#bbb"})[sizeof(args[Arg.REST])..];
   int desired_height = IMAGE_SIZE - 4; //2px padding top and bottom
   Image.Image ltr;
   // Find the biggest letter of specified font that fits within threshold
@@ -69,13 +82,13 @@ int main(int argc, array(string) argv) {
     if (tryme->ysize() >= desired_height) break;
   }
   // https://pike.lysator.liu.se/generated/manual/modref/ex/predef_3A_3A/Image/Color.html#Color
-  array shapecol = Colors.parse_color(shapecolor); // RGB array
-  Image.Image icon = Image.Image(64, 64, @Colors.parse_color(bgcolor));
+  array secondarycolor = Colors.parse_color(secondaryColor); // RGB array
+  Image.Image icon = Image.Image(64, 64, @Colors.parse_color(primaryColor));
   array txtcol = Colors.parse_color(textcolor);
 
   switch (shape) {
     case "circle":
-      icon->setcolor(@shapecol);
+      icon->setcolor(@secondarycolor);
       constant RADIUS = IMAGE_SIZE/2 - 1;
       constant RSQ = RADIUS ** 2;
       for (int x = 0; x < IMAGE_SIZE / 2; ++x)
@@ -87,6 +100,22 @@ int main(int argc, array(string) argv) {
             icon->setpixel(IMAGE_SIZE / 2 - x, IMAGE_SIZE / 2 - y); // upper left
           }
       break;
+    case "hsplit": icon->box(IMAGE_SIZE / 2,0, IMAGE_SIZE,IMAGE_SIZE, @secondarycolor); werror("Split H"); break;
+    case "vsplit": icon->box(0, IMAGE_SIZE /2, IMAGE_SIZE,IMAGE_SIZE, @secondarycolor); werror("Split V"); break;
+    case "dsplitl": icon->setcolor(@secondarycolor)->polyfill( ({ 0,0, IMAGE_SIZE,0, IMAGE_SIZE,IMAGE_SIZE }) ); break;
+    case "dsplitr": icon->setcolor(@secondarycolor)->polyfill( ({ 0,0, IMAGE_SIZE,0, 0,IMAGE_SIZE }) ); break;
+    case "hstripe": case "vstripe": {
+      constant STRIPE_COUNT = 6; //total, 3 of each colour
+      for(int i=1; i < STRIPE_COUNT; i+=2) { // paint stripes 1 three and five (0 - 5)
+        int start = IMAGE_SIZE * i / STRIPE_COUNT;
+        int end = IMAGE_SIZE * (i + 1) / STRIPE_COUNT;
+        if (shape == "hstripe") icon->box(0, start, IMAGE_SIZE, end, @secondarycolor);
+        else icon->box(start, 0, end, IMAGE_SIZE, @secondarycolor);
+      }
+      break;
+    }
+    case "star": break;
+    case "diamond": break;
     case "none": case "square": break;
     default: exit(1, "Unrecognized shape %O\n", shape);
   }
