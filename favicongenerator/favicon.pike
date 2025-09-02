@@ -35,6 +35,17 @@ Enhancement: Also output a manifest.json file:
 
 int main(int argc, array(string) argv) {
   mapping args = Arg.parse(argv); // parsed arguments
+  mapping cfg = MIME.parse_headers(Stdio.read_file("favicon.cfg") || "")[0]; // RFC822 style
+  constant DEFAULTS = ([
+    "size": 64,
+    "text": "",
+    "primarycolor": "#fff",
+    "textcolor": "#000",
+    "shape": "none",
+    "secondarycolor": "#bbb",
+  ]);
+  cfg = DEFAULTS | cfg;
+  // if no file will parse to an empty mapping.
   if (args->help) {
     write(#"USAGE: %s [text] [primaryColor] [textcolor] [shape] [secondaryColor]
     SUPPORTED SHAPES: circle or default to none
@@ -66,64 +77,63 @@ int main(int argc, array(string) argv) {
       "diamond (rotated square)"
     })));
   }
-  constant IMAGE_SIZE = 64;
-  [string text,
-  string primaryColor,
-  string textcolor,
-  string shape,
-  string secondaryColor] = args[Arg.REST] + ({"", "#fff", "#000", "none", "#bbb"})[sizeof(args[Arg.REST])..];
-  int desired_height = IMAGE_SIZE - 4; //2px padding top and bottom
+  array cmdlineargs = "text primarycolor textcolor shape secondarycolor" / " ";
+  // now update cfgs if args present
+  foreach (args[Arg.REST]; int i; string arg) cfg[cmdlineargs[i]] = arg;
+  int image_size = (int) cfg->size;
+  werror("CFG, %O\n", cfg);
+  int desired_height = image_size - 4; //2px padding top and bottom
   Image.Image ltr;
   // Find the biggest letter of specified font that fits within threshold
-  for (int sz = IMAGE_SIZE / 2; sz < 1024; ++sz) {
+  for (int sz = image_size / 2; sz < 1024; ++sz) {
     object font = Image.Fonts.open_font("Lato", sz, Image.Fonts.BOLD);
-    Image.Image tryme = font->write(text)->autocrop();
+    Image.Image tryme = font->write(cfg->text)->autocrop();
     if (tryme->ysize() <= desired_height) ltr = tryme;
     if (tryme->ysize() >= desired_height) break;
   }
   // https://pike.lysator.liu.se/generated/manual/modref/ex/predef_3A_3A/Image/Color.html#Color
-  array secondarycolor = Colors.parse_color(secondaryColor); // RGB array
-  Image.Image icon = Image.Image(64, 64, @Colors.parse_color(primaryColor));
-  array txtcol = Colors.parse_color(textcolor);
+  array secondarycolor = Colors.parse_color(cfg->secondarycolor); // RGB array
+  Image.Image icon = Image.Image(image_size, image_size, @Colors.parse_color(cfg->primarycolor));
+  array txtcol = Colors.parse_color(cfg->textcolor);
 
-  switch (shape) {
+  switch (cfg->shape) {
     case "circle":
       icon->setcolor(@secondarycolor);
-      constant RADIUS = IMAGE_SIZE/2 - 1;
-      constant RSQ = RADIUS ** 2;
-      for (int x = 0; x < IMAGE_SIZE / 2; ++x)
-        for (int y = 0; y < IMAGE_SIZE / 2; ++y)
-          if (x*x + y*y < RSQ) {
-            icon->setpixel(IMAGE_SIZE / 2 + x, IMAGE_SIZE / 2 + y); // lower right
-            icon->setpixel(IMAGE_SIZE / 2 + x, IMAGE_SIZE / 2 - y); // upper right
-            icon->setpixel(IMAGE_SIZE / 2 - x, IMAGE_SIZE / 2 + y); // lower left
-            icon->setpixel(IMAGE_SIZE / 2 - x, IMAGE_SIZE / 2 - y); // upper left
+      int radius = image_size/2 - 1;
+      int rsq = radius ** 2;
+      for (int x = 0; x < image_size / 2; ++x)
+        for (int y = 0; y < image_size / 2; ++y)
+          if (x*x + y*y < rsq) {
+            icon->setpixel(image_size / 2 + x, image_size / 2 + y); // lower right
+            icon->setpixel(image_size / 2 + x, image_size / 2 - y); // upper right
+            icon->setpixel(image_size / 2 - x, image_size / 2 + y); // lower left
+            icon->setpixel(image_size / 2 - x, image_size / 2 - y); // upper left
           }
       break;
-    case "hsplit": icon->box(IMAGE_SIZE / 2,0, IMAGE_SIZE,IMAGE_SIZE, @secondarycolor); werror("Split H"); break;
-    case "vsplit": icon->box(0, IMAGE_SIZE /2, IMAGE_SIZE,IMAGE_SIZE, @secondarycolor); werror("Split V"); break;
-    case "dsplitl": icon->setcolor(@secondarycolor)->polyfill( ({ 0,0, IMAGE_SIZE,0, IMAGE_SIZE,IMAGE_SIZE }) ); break;
-    case "dsplitr": icon->setcolor(@secondarycolor)->polyfill( ({ 0,0, IMAGE_SIZE,0, 0,IMAGE_SIZE }) ); break;
+    case "hsplit": icon->box(image_size / 2,0, image_size,image_size, @secondarycolor); werror("Split H"); break;
+    case "vsplit": icon->box(0, image_size /2, image_size,image_size, @secondarycolor); werror("Split V"); break;
+    case "dsplitl": icon->setcolor(@secondarycolor)->polyfill( ({ 0,0, image_size,0, image_size,image_size }) ); break;
+    case "dsplitr": icon->setcolor(@secondarycolor)->polyfill( ({ 0,0, image_size,0, 0,image_size }) ); break;
     case "hstripe": case "vstripe": {
       constant STRIPE_COUNT = 6; //total, 3 of each colour
       for(int i=1; i < STRIPE_COUNT; i+=2) { // paint stripes 1 three and five (0 - 5)
-        int start = IMAGE_SIZE * i / STRIPE_COUNT;
-        int end = IMAGE_SIZE * (i + 1) / STRIPE_COUNT;
-        if (shape == "hstripe") icon->box(0, start, IMAGE_SIZE, end, @secondarycolor);
-        else icon->box(start, 0, end, IMAGE_SIZE, @secondarycolor);
+        int start = image_size * i / STRIPE_COUNT;
+        int end = image_size * (i + 1) / STRIPE_COUNT;
+        if (cfg->shape == "hstripe") icon->box(0, start, image_size, end, @secondarycolor);
+        else icon->box(start, 0, end, image_size, @secondarycolor);
       }
       break;
     }
-    case "dtriangle": icon->setcolor(@secondarycolor)->polyfill( ({ 1,1, IMAGE_SIZE - 1,1, IMAGE_SIZE/2,IMAGE_SIZE - 1 }) ); break;
-    case "utriangle": icon->setcolor(@secondarycolor)->polyfill( ({ IMAGE_SIZE/2,1, IMAGE_SIZE - 1,IMAGE_SIZE-1, 1,IMAGE_SIZE-1 }) ); break;
+    case "dtriangle": icon->setcolor(@secondarycolor)->polyfill( ({ 1,1, image_size - 1,1, image_size/2,image_size - 1 }) ); break;
+    case "utriangle": icon->setcolor(@secondarycolor)->polyfill( ({ image_size/2,1, image_size - 1,image_size-1, 1,image_size-1 }) ); break;
     case "6star": {
-      icon->setcolor(@secondarycolor)->polyfill( ({ 1,IMAGE_SIZE*3/4, IMAGE_SIZE/2,1, IMAGE_SIZE-1,IMAGE_SIZE*3/4 }) ) // up triangle
-      ->polyfill( ({ 1,IMAGE_SIZE/4, IMAGE_SIZE/2,IMAGE_SIZE-1, IMAGE_SIZE-1,IMAGE_SIZE/4 }) ); // down triangle
+      icon->setcolor(@secondarycolor)->polyfill( ({ 1,image_size*3/4, image_size/2,1, image_size-1,image_size*3/4 }) ) // up triangle
+      ->polyfill( ({ 1,image_size/4, image_size/2,image_size-1, image_size-1,image_size/4 }) ); // down triangle
       break;}
-    case "diamond": icon->setcolor(@secondarycolor)->polyfill( ({ IMAGE_SIZE/2,1, IMAGE_SIZE - 1,IMAGE_SIZE/2, IMAGE_SIZE/2,IMAGE_SIZE - 1, 1,IMAGE_SIZE/2 }) ); break;
+    case "diamond": icon->setcolor(@secondarycolor)->polyfill( ({ image_size/2,1, image_size - 1,image_size/2, image_size/2,image_size - 1, 1,image_size/2 }) ); break;
     case "none": case "square": break;
-    default: exit(1, "Unrecognized shape %O\n", shape);
+    default: exit(1, "Unrecognized shape %O\n", cfg->shape);
   }
-  icon->paste_mask(Image.Image(ltr->xsize(), ltr->ysize(), @txtcol),ltr, (IMAGE_SIZE - ltr->xsize()) / 2, (IMAGE_SIZE - ltr->ysize()) / 2);
+  icon->paste_mask(Image.Image(ltr->xsize(), ltr->ysize(), @txtcol),ltr, (image_size - ltr->xsize()) / 2, (image_size - ltr->ysize()) / 2);
   Stdio.write_file("favicon.png",Image.PNG.encode(icon));
 }
