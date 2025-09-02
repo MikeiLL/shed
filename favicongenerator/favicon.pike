@@ -48,11 +48,11 @@ int main(int argc, array(string) argv) {
   // if no file will parse to an empty mapping.
   if (args->help) {
     write(#"USAGE: %s [text] [primaryColor] [textcolor] [shape] [secondaryColor]
-    SUPPORTED SHAPES: circle or default to none
-    (Leave off last two parameters for no circle.)
+    SUPPORTS a favicon.cfg file in current directory.
     OPTIONAL FLAGS
     --help
     --fontpath
+    --shapes
     EXAMPLES:
       %<s C magenta aliceblue
       %<s X magenta rebeccapurple circle darkblue
