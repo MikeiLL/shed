@@ -71,7 +71,7 @@ int main(int argc, array(string) argv) {
   string primaryColor,
   string textcolor,
   string shape,
-  string secondaryColor] = args[Arg.REST] + ({"M", "#fff", "#000", "none", "#bbb"})[sizeof(args[Arg.REST])..];
+  string secondaryColor] = args[Arg.REST] + ({"", "#fff", "#000", "none", "#bbb"})[sizeof(args[Arg.REST])..];
   int desired_height = IMAGE_SIZE - 4; //2px padding top and bottom
   Image.Image ltr;
   // Find the biggest letter of specified font that fits within threshold
@@ -114,8 +114,13 @@ int main(int argc, array(string) argv) {
       }
       break;
     }
-    case "star": break;
-    case "diamond": break;
+    case "dtriangle": icon->setcolor(@secondarycolor)->polyfill( ({ 1,1, IMAGE_SIZE - 1,1, IMAGE_SIZE/2,IMAGE_SIZE - 1 }) ); break;
+    case "utriangle": icon->setcolor(@secondarycolor)->polyfill( ({ IMAGE_SIZE/2,1, IMAGE_SIZE - 1,IMAGE_SIZE-1, 1,IMAGE_SIZE-1 }) ); break;
+    case "6star": {
+      icon->setcolor(@secondarycolor)->polyfill( ({ 1,IMAGE_SIZE*3/4, IMAGE_SIZE/2,1, IMAGE_SIZE-1,IMAGE_SIZE*3/4 }) ) // up triangle
+      ->polyfill( ({ 1,IMAGE_SIZE/4, IMAGE_SIZE/2,IMAGE_SIZE-1, IMAGE_SIZE-1,IMAGE_SIZE/4 }) ); // down triangle
+      break;}
+    case "diamond": icon->setcolor(@secondarycolor)->polyfill( ({ IMAGE_SIZE/2,1, IMAGE_SIZE - 1,IMAGE_SIZE/2, IMAGE_SIZE/2,IMAGE_SIZE - 1, 1,IMAGE_SIZE/2 }) ); break;
     case "none": case "square": break;
     default: exit(1, "Unrecognized shape %O\n", shape);
   }
