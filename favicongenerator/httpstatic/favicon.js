@@ -4,10 +4,11 @@ import * as utils from "./utils.js";
 
 export function render(state) {
   set_content("#indexbox", [
-    H1([state.hello, "Favicon"]),
-    H1(state.hello),
-    H1(state.hello),
-    H1(state.hello),
-    H1(state.hello),
+
   ]);
 }
+
+on("change", "input", (e) => ws_sync.send({
+  cmd: "configure",
+  [e.match.name]: e.match.value,
+}))
