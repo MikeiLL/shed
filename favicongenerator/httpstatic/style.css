@@ -1,0 +1,10 @@
+* {
+  box-sizing: border-box;
+}
+
+
+#indexbox {
+  padding: 10em;
+  color: aliceblue;
+  background-color: rebeccapurple;
+}
