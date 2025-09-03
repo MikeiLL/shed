@@ -12,6 +12,11 @@ mapping(string:mixed)|Concurrent.Future http_request(Protocols.HTTP.Server.Reque
 	return render(req, markdown, (["vars": (["ws_group": "" /* type and code may be specified here */])]));
 }
 
+__async__ mapping get_state(string|int group, string|void id, string|void type) {
+	werror("Getting state for %O %O %O\n", group, id, type);
+  return (["hello": "world."]);
+}
+
 protected void create(string name) {
 	::create(name);
 	G->G->http_endpoints[""] = http_request;
