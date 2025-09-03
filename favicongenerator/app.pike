@@ -66,16 +66,14 @@ int bootstrap_all()
 		bootstrap_files = main->bootstrap_files;
 	}
 	int err = 0;
-	foreach (bootstrap_files, string fn)
+	foreach (bootstrap_files, string fn){
 		if (file_stat(fn)->isdir)
 		{
 			foreach (sort(get_dir(fn)), string f)
 				if (has_suffix(f, ".pike")) err += !bootstrap(fn + "/" + f);
 		}
 		else err += !bootstrap(fn);
-	if (!err && !restricted_update) {
-		Stdio.write_file("constant_sources.json", Standards.JSON.encode(constant_sources, 7));
-	}
+  }
 	return err;
 }
 
@@ -91,7 +89,7 @@ int | Concurrent.Future main(int argc,array(string) argv)
 	foreach ("tables usercreate userdelete userupdate help" / " ", string cmd) if (G->args[cmd]) G->args->exec = cmd;
 	if (string fn = G->args->exec) {
 		// pike app.pike --exec=test
-		restricted_update = ({"globals.pike", "console.pike", "database.pike", "utils.pike"});
+		restricted_update = ({"globals.pike", "console.pike", "utils.pike"});
 		constant_sources = Standards.JSON.decode(Stdio.read_file("constant_sources.json") || "{}");
 		bootstrap_all();
 		if (fn == 1)
