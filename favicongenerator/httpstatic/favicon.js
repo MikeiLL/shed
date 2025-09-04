@@ -9,7 +9,7 @@ export function render(state) {
   if (state.url && state.url !== img.src) img.src = state.url;
 }
 
-on("change", "input", (e) => ws_sync.send({
+on("change", "input, select", (e) => ws_sync.send({
   cmd: "configure",
   [e.match.name]: e.match.value,
 }))

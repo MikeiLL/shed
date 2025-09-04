@@ -17,6 +17,21 @@ constant markdown = #"# Dashboard
   <label>Primary Color<input type=color name=primarycolor></label>
   <label>Secondary Color<input type=color name=secondarycolor></label>
   <label>Text Color<input type=color name=textcolor></label>
+  <label>Shape/Pattern<select name=shape>
+    <option value=none>None</option>
+    <option value=circle>Circle</option>
+    <option value=diamond>Diamond</option>
+    <option value=6star>Six Pointed Star</option>
+    <option value=hsplit>Horizontal Split</option>
+    <option value=vsplit>Vertical Split</option>
+    <option value=dsplitl>Diagonal Split Left</option>
+    <option value=dsplitr>Diagonal Split Right</option>
+    <option value=hstripe>Horizontal Stripes</option>
+    <option value=vstripe>Vertical Stripes</option>
+    <option value=dtriangle>Down Triangle</option>
+    <option value=utriangle>Up Triangle</option>
+    </select>
+  </label>
 </form>
 <div id=indexbox>
 <img id=preview>
