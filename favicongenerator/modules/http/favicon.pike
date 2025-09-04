@@ -1,7 +1,7 @@
 inherit http_websocket;
 
 mapping default_settings = ([
-  "singleletter": "G",
+  "text": "G",
   "primarycolor": "#770055",
   "secondarycolor": "#00dddd",
   "textcolor": "#6677cc",
@@ -12,7 +12,7 @@ mapping default_settings = ([
 
 constant markdown = #"# Dashboard
 <form id=controls>
-  <label>Single Letter Text<input type=text name=singleletter size=1></label>
+  <label>Single Letter Text<input type=text name=text size=1></label>
   <label>Primary Color<input type=color name=primarycolor></label>
   <label>Secondary Color<input type=color name=secondarycolor></label>
   <label>Text Color<input type=color name=textcolor></label>
