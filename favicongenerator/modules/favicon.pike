@@ -1,4 +1,5 @@
 #!/usr/bin/env pike
+inherit annotated;
 /*
 Accept up to five arguments:
     text: displayed in center of icon,
@@ -51,7 +52,7 @@ int main(int argc, array(string) argv) {
     SUPPORTS a favicon.cfg file in current directory.
     OPTIONAL FLAGS
     --help
-    --fontpath
+    --listfonts
     --shapes
     EXAMPLES:
       %<s C magenta aliceblue
@@ -59,13 +60,11 @@ int main(int argc, array(string) argv) {
     ", basename(argv[0]));
     return 0;
   }
-  string fontspath = args->fontpath || "/Users/mikekilmer/Library/Fonts";
-  Image.Fonts.set_font_dirs(({fontspath}));
-  if (args->listfonts) {
+  /* if (args->listfonts) {
     write("Fonts in %s: %O\n", fontspath, sort(indices(Image.Fonts.list_fonts())));
-  }
+  } */
   if (args->shapes) {
-    write("Shape Options %s: %O\n", fontspath, sort(({
+    write("Shape Options: %O\n", sort(({
       "square (default)",
       "hsplit (split horizontal)",
       "vsplit (split vertical)",
@@ -83,8 +82,9 @@ int main(int argc, array(string) argv) {
   Stdio.write_file("favicon.png",Image.PNG.encode(generate_favicon(cfg)));
 }
 
+@export:
 Image.Image generate_favicon(mapping cfg){
-  int image_size = (int) cfg->size;
+  int image_size = (int) cfg->size || 64;
   werror("CFG, %O\n", cfg);
   int desired_height = image_size - 4; //2px padding top and bottom
   Image.Image ltr;
@@ -140,4 +140,10 @@ Image.Image generate_favicon(mapping cfg){
   }
   icon->paste_mask(Image.Image(ltr->xsize(), ltr->ysize(), @txtcol),ltr, (image_size - ltr->xsize()) / 2, (image_size - ltr->ysize()) / 2);
   return icon;
+}
+
+protected void create(string name) {
+  ::create(name);
+  string fontspath = "/Users/mikekilmer/Library/Fonts";
+  Image.Fonts.set_font_dirs(({fontspath}));
 }
