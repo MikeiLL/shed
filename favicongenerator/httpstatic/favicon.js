@@ -3,6 +3,8 @@ const {H1} = choc; //autoimport
 import * as utils from "./utils.js";
 
 export function render(state) {
+  const frm = DOM("#controls").elements;
+  for (let attr in state) if (frm[attr]) frm[attr].value = state[attr];
   set_content("#indexbox", [
 
   ]);
