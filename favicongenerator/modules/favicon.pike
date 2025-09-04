@@ -90,7 +90,7 @@ Image.Image generate_favicon(mapping cfg){
   Image.Image ltr;
   // Find the biggest letter of specified font that fits within threshold
   for (int sz = image_size / 2; sz < 1024; ++sz) {
-    object font = Image.Fonts.open_font("Lato", sz, Image.Fonts.BOLD);
+    object font = Image.Fonts.open_font(cfg->font || "Lato", sz, Image.Fonts.BOLD);
     Image.Image tryme = font->write(cfg->text)->autocrop();
     if (tryme->ysize() <= desired_height) ltr = tryme;
     if (tryme->ysize() >= desired_height) break;

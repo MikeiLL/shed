@@ -5,6 +5,16 @@
 
 #indexbox {
   padding: 10em;
-  color: aliceblue;
-  background-color: rebeccapurple;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid grey;
+}
+
+label {
+  margin: 0 1em;
+  display: inline-flex;
+  gap: 0.5em;
+  flex-direction: row;
+  align-items: center;
 }
