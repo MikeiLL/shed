@@ -5,9 +5,8 @@ import * as utils from "./utils.js";
 export function render(state) {
   const frm = DOM("#controls").elements;
   for (let attr in state) if (frm[attr]) frm[attr].value = state[attr];
-  set_content("#indexbox", [
-
-  ]);
+  const img = DOM("#preview");
+  if (state.url && state.url !== img.src) img.src = state.url;
 }
 
 on("change", "input", (e) => ws_sync.send({

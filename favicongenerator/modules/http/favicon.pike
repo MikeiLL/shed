@@ -19,6 +19,7 @@ constant markdown = #"# Dashboard
   <label>Text Color<input type=color name=textcolor></label>
 </form>
 <div id=indexbox>
+<img id=preview>
 </div>
 ";
 
