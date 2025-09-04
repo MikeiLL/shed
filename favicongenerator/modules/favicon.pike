@@ -80,6 +80,10 @@ int main(int argc, array(string) argv) {
   array cmdlineargs = "text primarycolor textcolor shape secondarycolor" / " ";
   // now update cfgs if args present
   foreach (args[Arg.REST]; int i; string arg) cfg[cmdlineargs[i]] = arg;
+  Stdio.write_file("favicon.png",Image.PNG.encode(generate_favicon(cfg)));
+}
+
+Image.Image generate_favicon(mapping cfg){
   int image_size = (int) cfg->size;
   werror("CFG, %O\n", cfg);
   int desired_height = image_size - 4; //2px padding top and bottom
@@ -135,5 +139,5 @@ int main(int argc, array(string) argv) {
     default: exit(1, "Unrecognized shape %O\n", cfg->shape);
   }
   icon->paste_mask(Image.Image(ltr->xsize(), ltr->ysize(), @txtcol),ltr, (image_size - ltr->xsize()) / 2, (image_size - ltr->ysize()) / 2);
-  Stdio.write_file("favicon.png",Image.PNG.encode(icon));
+  return icon;
 }
