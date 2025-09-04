@@ -85,7 +85,6 @@ int main(int argc, array(string) argv) {
 @export:
 Image.Image generate_favicon(mapping cfg){
   int image_size = (int) cfg->size || 64;
-  werror("CFG, %O\n", cfg);
   int desired_height = image_size - 4; //2px padding top and bottom
   Image.Image ltr;
   // Find the biggest letter of specified font that fits within threshold

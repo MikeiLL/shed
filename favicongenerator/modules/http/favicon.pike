@@ -249,7 +249,6 @@ mapping get_state(string|int group, string|void id, string|void type) {
 }
 
 void websocket_cmd_configure(mapping(string:mixed) conn, mapping(string:mixed) msg) {
-  werror("Configure: %O\n", msg);
   if (!favicon_configs[conn->group]) favicon_configs[conn->group] = ([]);
   favicon_configs[conn->group] |= default_settings & msg;
   send_updates_all(conn->group);
