@@ -12,7 +12,7 @@ mapping default_settings = ([
 
 @retain: mapping favicon_configs = ([]);
 
-array select_fonts = ({ /* 216 elements */
+array select_fonts = ({
     "Adobe Jenson Pro",
     "AdobeJensonSmallCaps",
     "Aloja Extended",
@@ -160,7 +160,6 @@ array select_fonts = ({ /* 216 elements */
     "Saab",
     "Sabler Titling",
     "Sahadeva",
-    "San?s Extended",
     "Scansky",
     "Si Kancil",
     "SimSun",
@@ -174,14 +173,8 @@ array select_fonts = ({ /* 216 elements */
     "TypeMyMusic",
     "Undeka",
     "Vanio Trial",
-    "Weather Icons",
     "Weem",
-    "Whoa!",
-    "all-the-icons",
     "file-icons",
-    "github-octicons",
-    "icomoon",
-    "lilyjazz-chord",
     "lilyjazz-text"
 });
 
