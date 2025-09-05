@@ -174,6 +174,7 @@ array select_fonts = ({
     "Undeka",
     "Vanio Trial",
     "Weem",
+    "Whoa!"
     "file-icons",
     "lilyjazz-text"
 });
