@@ -6,7 +6,11 @@ export function render(state) {
   const frm = DOM("#controls").elements;
   for (let attr in state) if (frm[attr]) frm[attr].value = state[attr];
   const img = DOM("#preview");
-  if (state.url && state.url !== img.src) img.src = state.url;
+  if (state.url && state.url !== img.src) {
+    img.src = state.url;
+    DOM("#download").href = state.url;
+    DOM("#cfgs").value = state.cfgfields.map((k) => k + ": " + state[k]).join("\n")
+  }
 }
 
 on("change", "input, select", (e) => ws_sync.send({
