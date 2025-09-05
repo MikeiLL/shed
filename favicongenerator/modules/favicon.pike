@@ -29,9 +29,9 @@ int main(int argc, array(string) argv) {
     ", basename(argv[0]));
     return 0;
   }
-  /* if (args->listfonts) {
-    write("Fonts in %s: %O\n", fontspath, sort(indices(Image.Fonts.list_fonts())));
-  } */
+  if (args->listfonts) {
+    write("Fonts in %s: %O\n", "/Users/mikekilmer/Library/Fonts", sort(indices(Image.Fonts.list_fonts())));
+  }
   if (args->shapes) {
     write("Shape Options: %O\n", sort(({
       "square (default)",
