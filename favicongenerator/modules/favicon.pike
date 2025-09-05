@@ -1,38 +1,7 @@
 #!/usr/bin/env pike
+#if constant(G)
 inherit annotated;
-/*
-Accept up to five arguments:
-    text: displayed in center of icon,
-    background-color: default white,
-    text-color: default black,
-    shape: displayed within a square,
-    shape-color: default light grey
-Produce four matching image.ico files in following sizes:
-    16x16
-    32x32
-    48x48
-    64x64
-Enhancement: Also output a manifest.json file:
-{
-  "name": "",
-  "short_name": "",
-  "icons": [
-    {
-      "src": "/android-chrome-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/android-chrome-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone"
-}
-*/
+#else
 
 int main(int argc, array(string) argv) {
   mapping args = Arg.parse(argv); // parsed arguments
@@ -81,8 +50,11 @@ int main(int argc, array(string) argv) {
   foreach (args[Arg.REST]; int i; string arg) cfg[cmdlineargs[i]] = arg;
   Stdio.write_file("favicon.png",Image.PNG.encode(generate_favicon(cfg)));
 }
+#endif
 
+#if constant(G)
 @export:
+#endif
 Image.Image generate_favicon(mapping cfg){
   int image_size = (int) cfg->size || 64;
   int desired_height = image_size - 4; //2px padding top and bottom
@@ -142,7 +114,9 @@ Image.Image generate_favicon(mapping cfg){
 }
 
 protected void create(string name) {
+  #if constant(G)
   ::create(name);
+  #endif
   string fontspath = "/Users/mikekilmer/Library/Fonts";
   Image.Fonts.set_font_dirs(({fontspath}));
 }
